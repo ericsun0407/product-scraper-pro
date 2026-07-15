@@ -333,9 +333,9 @@ def extract_images(soup: BeautifulSoup, page_url: str) -> list[str]:
     for tag in soup.find_all("source"):
         srcset = tag.get("srcset", "")
         for part in srcset.split(","):
-            part = part.strip().split()[0]
-            if part:
-                add(urljoin(page_url, part))
+            tokens = part.strip().split()
+            if tokens:
+                add(urljoin(page_url, tokens[0]))
 
     return urls
 
@@ -398,6 +398,7 @@ def scrape_page(url: str, depth: int = 0):
 # ── 入口 ──────────────────────────────────────────────────────────────────────
 
 def main():
+    global OUTPUT_DIR, MAX_DEPTH, REQUEST_DELAY
     parser = argparse.ArgumentParser(description="miyazakichair.com 图片爬虫")
     parser.add_argument("--url", default=BASE_URL, help="起始 URL")
     parser.add_argument("--output", default="downloads", help="输出目录")
@@ -405,7 +406,6 @@ def main():
     parser.add_argument("--delay", type=float, default=REQUEST_DELAY, help="请求间隔（秒）")
     args = parser.parse_args()
 
-    global OUTPUT_DIR, MAX_DEPTH, REQUEST_DELAY
     OUTPUT_DIR = Path(args.output)
     MAX_DEPTH = args.depth
     REQUEST_DELAY = args.delay
